@@ -13,7 +13,7 @@ installs the same charts with Helm commands. It uses the same namespace
 
 | Component | Version |
 | --- | --- |
-| Kubernetes | 1.31 or later |
+| Kubernetes | 1.33 or later (Flux 2.9 needs 1.33; the Gateway API CRDs need 1.31) |
 | Flux | 2.9 |
 | Gateway API CRDs | v1.6.1, standard channel |
 | cert-manager | v1.21.1 |
@@ -85,26 +85,68 @@ flux build kustomization demo-wproofreader-stack \
 
 ## Order of deployment
 
-`dependsOn` sets the order of the layers. Each Kustomization has
-`wait: true`. Thus, it becomes ready only when all objects that it applied
-are healthy.
+Flux deploys the stack in two levels:
 
-```
-sources -> gateway-api-crds -> traefik -----------------------------\
-        -> cert-manager     -> cluster-resources (ClusterIssuer) ----+-> <environment>-wproofreader-stack
-                                                                         mysql -> wproofreader-app -> admin-panel
+1. Flux Kustomizations, one for each layer, in `clusters/local/`.
+2. HelmReleases of an environment, in `environments/<environment>/`.
+
+On both levels, `dependsOn` sets the order. An object starts only when all
+objects in its `dependsOn` list are ready.
+
+```mermaid
+flowchart LR
+  subgraph layers["Flux Kustomizations (clusters/local/)"]
+    sources --> gwcrds[gateway-api-crds]
+    sources --> certmanager[cert-manager]
+    gwcrds --> traefik
+    certmanager --> clusterres[cluster-resources]
+    traefik --> stack[demo-wproofreader-stack]
+    clusterres --> stack
+  end
+  subgraph releases["HelmReleases (environments/demo/)"]
+    mysql --> wpr[wproofreader-app]
+    mysql --> ap[admin-panel]
+    wpr --> ap
+  end
+  stack -. applies .-> releases
 ```
 
-The HelmReleases of an environment also use `dependsOn`. helm-controller runs
-`helm install` and `helm upgrade`, so the db-manager Job of WProofreader
-Server and the migration Job of Admin-panel run as usual Helm hooks.
+| Layer | Installs | Starts after | Is ready when |
+| --- | --- | --- | --- |
+| `sources` | GitRepository and HelmRepository objects | (first layer) | Flux has downloaded each chart source |
+| `gateway-api-crds` | Gateway API CRDs v1.6.1 | `sources` | the CRDs are established |
+| `cert-manager` | cert-manager and its CRDs | `sources` | the cert-manager Pods and webhook are ready |
+| `traefik` | Traefik and the `traefik` GatewayClass | `gateway-api-crds` | the Traefik Pod is ready |
+| `cluster-resources` | the `selfsigned` ClusterIssuer | `cert-manager` | the ClusterIssuer is ready |
+| `demo-wproofreader-stack` | the three HelmReleases of the environment | `traefik` and `cluster-resources` | all three HelmReleases are ready |
+
+Inside `demo-wproofreader-stack`, the HelmReleases start in this order:
+
+| HelmRelease | Starts after | What happens |
+| --- | --- | --- |
+| `mysql` | (first) | MySQL starts and creates `admin_panel_db` and the `admin_panel` user. |
+| `wproofreader-app` | `mysql` | The db-manager hook Job creates `cloud_service` and its users. Then WProofreader Server starts. |
+| `admin-panel` | `mysql` and `wproofreader-app` | The migration hook Job creates the tables in `admin_panel_db`. Then the web, worker, and scheduler Pods start. |
+
+Each Kustomization has `wait: true`. Thus, a layer is ready only when all
+objects that it applied are healthy. Each HelmRelease waits until Helm
+reports the release as ready. helm-controller runs `helm install` and
+`helm upgrade`, so the db-manager Job and the migration Job run as usual Helm
+`pre-install,pre-upgrade` hooks.
+
+If a layer is not ready, the layers after it do not start. To find the layer
+that blocks the deployment, run:
+
+```bash
+flux get kustomizations
+flux get helmreleases --all-namespaces
+```
 
 ## Step by step
 
 This procedure deploys the `demo` environment from this repository, without
-changes, on a local [kind](https://kind.sigs.k8s.io/) cluster. Use it to see
-how the stack starts and how Flux shows it. On another cluster, start at
-step 2.
+changes. Use it on a test cluster to see how the stack starts and how
+Flux shows it.
 
 To deploy your own configuration, first make your own copy of the
 repository. See [Make your own copy](../README.md#make-your-own-copy). Then
@@ -112,25 +154,82 @@ use the same steps with your copy.
 
 ### 0. Prerequisites
 
-- `kubectl`, `kind`, the `flux` CLI 2.9, `openssl`, `git`, and Docker.
-- [cloud-provider-kind](https://github.com/kubernetes-sigs/cloud-provider-kind).
-  It gives LoadBalancer addresses to Services in kind clusters.
+- `kubectl`, the `flux` CLI 2.9, `openssl`, and `git`.
 - A WProofreader license ticket ID.
+- A Kubernetes cluster. See step 1.
 
-### 1. Create the cluster
+### 1. Prepare the cluster
+
+You can use any Kubernetes cluster that meets these requirements:
+
+- Kubernetes 1.33 or later. `flux check --pre` stops on earlier versions.
+- A LoadBalancer implementation. The Traefik Service must get an external
+  address. If it stays `<pending>`, the stack deploys, but you cannot reach it
+  from outside the cluster.
+- A default StorageClass. MySQL keeps its data on an 8 GiB volume.
+- Approximately 6 CPUs and 12 GiB of memory that are free for the stack.
+
+Make sure that `kubectl` uses this cluster:
 
 ```bash
-kind create cluster --name wproofreader --image kindest/node:v1.31.9
+kubectl config current-context
+kubectl version
 ```
 
-In a second terminal, start cloud-provider-kind and keep it running:
+The server version must be 1.33 or later.
+
+These examples create a local test cluster. Use one of them, or use a cluster
+that you already have.
+
+<details>
+<summary>minikube</summary>
+
+```bash
+minikube start --cpus=6 --memory=12g
+```
+
+minikube 1.36 or later starts Kubernetes 1.33 or later by default. For an
+older minikube, add `--kubernetes-version=v1.33.1`.
+
+In a second terminal, start the tunnel and keep it running. It gives
+LoadBalancer addresses to Services:
+
+```bash
+minikube tunnel
+```
+
+The tunnel can ask for your password, because it opens ports 80 and 443.
+
+</details>
+
+<details>
+<summary>kind</summary>
+
+```bash
+kind create cluster --name wproofreader --image kindest/node:v1.33.1
+```
+
+In a second terminal, start
+[cloud-provider-kind](https://github.com/kubernetes-sigs/cloud-provider-kind)
+and keep it running. It gives LoadBalancer addresses to Services:
 
 ```bash
 sudo cloud-provider-kind
 ```
 
-Without it, the Traefik Service stays `<pending>`, Helm continues to wait,
-and the `traefik` layer does not become ready.
+Give Docker approximately 6 CPUs and 12 GiB of memory.
+
+</details>
+
+<details>
+<summary>Managed cluster (EKS, AKS, GKE, or other)</summary>
+
+A managed cluster usually has a LoadBalancer implementation and a default
+StorageClass. Make sure that the Kubernetes version is 1.33 or later. A
+LoadBalancer Service can cost money and can be reachable from the internet.
+Remove the stack when you complete the test.
+
+</details>
 
 Clone this repository:
 
@@ -332,11 +431,8 @@ together.
 
 ## Remove the stack
 
-To remove a disposable kind cluster:
-
-```bash
-kind delete cluster --name wproofreader
-```
+To remove a local test cluster, delete it, for example `minikube delete` or
+`kind delete cluster --name wproofreader`.
 
 To remove one environment and keep the shared components, delete its cluster
 file from Git:
@@ -368,7 +464,10 @@ flux uninstall
 ```
 
 The Gateway API CRDs stay, because their Kustomization has `prune: false`.
-The cert-manager CRDs also stay, because Helm does not delete CRDs.
+The cert-manager CRDs also stay, because Helm does not delete CRDs. The `wsc`
+namespace also stays, with the Secrets, the `admin-panel-tls` certificate
+Secret, the completed db-manager Job, and the MySQL volume. To delete them,
+run `kubectl delete namespace wsc`. This deletes the MySQL data.
 
 ## Multi-tenancy
 

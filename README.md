@@ -93,14 +93,13 @@ This repository refers to them by URL and pinned revision.
 
 ## Requirements
 
-- Kubernetes 1.31 or later. The Gateway API v1.6.1 CRDs do not install on
-  earlier versions. If your cluster already has a Gateway API controller and a
-  ClusterIssuer, you can skip the shared components. Then the requirement of
-  the charts applies (Kubernetes 1.27 or later).
-- A LoadBalancer implementation for the Traefik Service. Traefik and the
-  layers that depend on it do not become ready while the Service has no
-  external address.
 - Argo CD 3.5 or Flux 2.9.
+- Kubernetes 1.31 or later with Argo CD, and 1.33 or later with Flux 2.9.
+  The Gateway API v1.6.1 CRDs do not install on versions before 1.31, and
+  Flux 2.9 does not support versions before 1.33.
+- A LoadBalancer implementation for the Traefik Service. Without an external
+  address, you cannot reach the stack from outside the cluster, and Argo CD
+  does not report Traefik as healthy.
 - A WProofreader license ticket ID.
 
 ## What the configurations deploy
