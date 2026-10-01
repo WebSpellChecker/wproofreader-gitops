@@ -1,0 +1,13 @@
+# Gateway API only: no Ingress / IngressRoute providers and no default IngressClass, so
+# Traefik never competes with an existing ingress controller on a shared cluster.
+providers:
+  kubernetesGateway:
+    enabled: true   # registers the `traefik` GatewayClass
+  kubernetesIngress:
+    enabled: false
+  kubernetesCRD:
+    enabled: false
+ingressClass:
+  enabled: false
+gateway:
+  enabled: false    # the Admin-panel chart creates its own Gateway

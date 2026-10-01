@@ -1,0 +1,28 @@
+# Wave 3: Admin-panel (web, worker, scheduler, and the migration hook).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.environment }}-admin-panel
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io   # deleting the Application removes its workloads (PVCs stay)
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: wproofreader
+  sources:
+    - repoURL: {{ .Values.charts.adminPanel.repoURL }}
+      targetRevision: {{ .Values.charts.adminPanel.revision }}
+      path: admin-panel
+      helm:
+        releaseName: admin-panel
+        valueFiles:
+          - $values/argocd/environments/{{ .Values.environment }}/admin-panel.yaml
+    {{ include "stack.valuesSource" . | nindent 4 }}
+  destination:
+    {{- include "stack.destination" . | nindent 4 }}
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    retry:                                   # waves between Applications are best-effort on first sync; retry instead of staying Failed
+      limit: 10
+      backoff: { duration: 15s, factor: 2, maxDuration: 3m }

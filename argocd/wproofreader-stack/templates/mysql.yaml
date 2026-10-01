@@ -1,0 +1,28 @@
+# Wave 1: MySQL 8.4 for Admin-panel (admin_panel_db) and WProofreader Server (cloud_service).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.environment }}-mysql
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io   # deleting the Application removes its workloads (PVCs stay)
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: wproofreader
+  sources:
+    - repoURL: {{ .Values.charts.mysql.repoURL }}
+      targetRevision: {{ .Values.charts.mysql.revision }}
+      path: .
+      helm:
+        releaseName: mysql             # fixed: the values files use the Service name mysql-primary
+        valueFiles:
+          - $values/argocd/environments/{{ .Values.environment }}/mysql.yaml
+    {{ include "stack.valuesSource" . | nindent 4 }}
+  destination:
+    {{- include "stack.destination" . | nindent 4 }}
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    retry:                                   # waves between Applications are best-effort on first sync; retry instead of staying Failed
+      limit: 10
+      backoff: { duration: 15s, factor: 2, maxDuration: 3m }

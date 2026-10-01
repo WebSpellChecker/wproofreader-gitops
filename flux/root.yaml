@@ -1,0 +1,44 @@
+# Root of the WProofreader stack for Flux. Apply this ONE file one time, after `flux install`
+# (see flux/README.md):
+#
+#   kubectl apply -f flux/root.yaml
+#
+# It registers this repository as a source and adds a root Kustomization that syncs
+# flux/clusters/local/. That directory holds one Flux Kustomization for each layer:
+#   sources            -> flux/sources          GitRepository and HelmRepository objects (pinned chart revisions)
+#   gateway-api-crds   -> Gateway API repo      standard-channel CRDs, tag v1.6.1
+#   cert-manager       -> flux/shared/cert-manager
+#   traefik            -> flux/shared/traefik   (dependsOn gateway-api-crds)
+#   cluster-resources  -> flux/shared/cluster-resources   selfsigned ClusterIssuer (dependsOn cert-manager)
+#   demo-wproofreader-stack -> flux/environments/demo  3 HelmReleases (dependsOn traefik, cluster-resources)
+#
+# Everything that Flux reconciles from this repository runs with the cluster-admin rights of
+# kustomize-controller (the Flux default). Thus, push or merge access to this repository IS
+# cluster-admin access. Protect the branch and require review (.github/CODEOWNERS). For a
+# multi-tenant lockdown, see https://fluxcd.io/flux/installation/configuration/multitenancy/.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: wproofreader-gitops
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/WebSpellChecker/wproofreader-gitops
+  ref:
+    branch: main
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: wproofreader-root
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 1m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: wproofreader-gitops
+  path: ./flux/clusters/local
+  prune: true
+  wait: true   # Ready only when every layer's Kustomization below is Ready

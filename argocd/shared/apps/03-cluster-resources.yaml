@@ -1,0 +1,22 @@
+# Wave 0: cluster-scoped resources that depend on cert-manager CRDs (the ClusterIssuer).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-resources
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: shared
+  source:
+    repoURL: https://github.com/WebSpellChecker/wproofreader-gitops
+    targetRevision: main
+    path: argocd/shared/cluster-resources
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    retry:                                   # waves between Applications are best-effort on first sync; retry instead of staying Failed
+      limit: 10
+      backoff: { duration: 15s, factor: 2, maxDuration: 3m }

@@ -1,0 +1,44 @@
+# Wave 1: one WProofreader stack per directory under argocd/environments/ ("add a folder, get a stack").
+# Each generated Application is an App-of-Apps (wproofreader-stack/ chart) whose children
+# keep their own sync waves: MySQL -> WProofreader Server -> Admin-panel. Runs after `shared`.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: wproofreader-stacks
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/WebSpellChecker/wproofreader-gitops
+        revision: main
+        files:
+          - path: argocd/environments/*/stack.yaml
+  template:
+    metadata:
+      name: '{{ .path.basename }}-wproofreader-stack'
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: bootstrap        # parent App-of-Apps; its children use project wproofreader
+      source:
+        repoURL: https://github.com/WebSpellChecker/wproofreader-gitops
+        targetRevision: main
+        path: argocd/wproofreader-stack
+        helm:
+          parameters:
+            - name: environment
+              value: '{{ .path.basename }}'
+            - name: namespace
+              value: '{{ .namespace }}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+        retry:
+          limit: 10
+          backoff: { duration: 15s, factor: 2, maxDuration: 3m }

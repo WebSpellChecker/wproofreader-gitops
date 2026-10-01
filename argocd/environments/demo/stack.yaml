@@ -1,0 +1,5 @@
+# One WProofreader stack. The ApplicationSet in argocd/bootstrap/wproofreader-stacks.yaml
+# finds every argocd/environments/*/stack.yaml and deploys argocd/wproofreader-stack/ with
+# these parameters and the values files in this directory. To add an environment, copy
+# this directory.
+namespace: wsc

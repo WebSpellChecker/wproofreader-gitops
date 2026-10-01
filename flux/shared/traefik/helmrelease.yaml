@@ -1,0 +1,33 @@
+# Traefik with the Gateway API provider only (registers the `traefik` GatewayClass). Swap for
+# Envoy Gateway if you prefer (then set gatewayClassName=eg, gateway.listenerPort=80,
+# tls.listenerPort=443 in flux/environments/<name>/values/admin-panel.yaml).
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+spec:
+  interval: 10m
+  timeout: 10m
+  releaseName: traefik
+  chart:
+    spec:
+      chart: traefik
+      version: 41.5.0        # Traefik v3.7; Gateway API v1.6.1 CRDs come from the gateway-api-crds Kustomization
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+      interval: 1h
+  install:
+    crds: Skip               # Gateway-only: the chart bundles 25 traefik.io/hub.traefik.io CRDs we do not use
+    remediation:
+      retries: 3
+  upgrade:
+    crds: Skip
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  valuesFrom:
+    - kind: ConfigMap
+      name: traefik-values

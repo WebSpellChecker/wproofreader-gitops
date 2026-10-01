@@ -1,0 +1,21 @@
+# One WProofreader stack instance: the three HelmReleases in flux/environments/demo and the
+# values files in flux/environments/demo/values/. Add an environment: copy that directory and
+# this file, then edit the names below.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: demo-wproofreader-stack
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 1m
+  timeout: 20m                   # covers MySQL start + db-manager and migrate hook Jobs
+  dependsOn:
+    - name: traefik
+    - name: cluster-resources
+  sourceRef:
+    kind: GitRepository
+    name: wproofreader-gitops
+  path: ./flux/environments/demo
+  prune: true
+  wait: true                     # Ready once all three HelmReleases are Ready

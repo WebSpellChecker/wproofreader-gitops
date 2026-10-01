@@ -1,0 +1,12 @@
+# mysql: one MySQL 8.4 server for the stack. The chart creates admin_panel_db and the
+# admin_panel user; db-manager (wproofreader-app) creates cloud_service and its users.
+# Plain Helm values: also usable with `helm install mysql ./mysql-server-helm -f mysql.yaml`.
+image:
+  tag: "8.4"
+auth:
+  existingSecret: mysql-credentials   # keys: mysql-root-password, mysql-password
+  database: admin_panel_db
+  username: admin_panel
+primary:
+  persistence:
+    size: 8Gi

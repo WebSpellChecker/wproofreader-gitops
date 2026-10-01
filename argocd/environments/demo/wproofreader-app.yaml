@@ -1,0 +1,10 @@
+# wproofreader-app: WProofreader Server and the db-manager provisioning hook.
+# The image tags default to the chart appVersion (WProofreader 6.18.1.0 for chart 1.4.0).
+licenseExistingSecret: wproofreader-license   # key: license
+database:
+  enabled: true
+  host: mysql-primary.wsc.svc.cluster.local
+  existingSecret: wproofreader-db   # keys: root-password, appserver-password, admin-panel-password
+databaseProvisioning:
+  enabled: true
+  rootUser: root

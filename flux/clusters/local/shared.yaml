@@ -1,0 +1,82 @@
+# Cluster dependencies shared by every WProofreader stack. `dependsOn` is the ordering: a
+# Kustomization starts only after its dependencies are Ready, and with `wait: true` Ready
+# means the HelmRelease / CRDs it applied are healthy.
+#
+#   gateway-api-crds -> traefik
+#   cert-manager     -> cluster-resources (ClusterIssuer needs the cert-manager webhook)
+#
+# Optional on clusters that already provide a GatewayClass and a ClusterIssuer: drop this
+# file from kustomization.yaml, remove the dependsOn entries in the stack Kustomizations and
+# point gateway.gatewayClassName / gateway.tls.certManager.issuerRef in
+# flux/environments/<name>/values/admin-panel.yaml at the existing ones.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: gateway-api-crds
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 1m
+  timeout: 3m
+  dependsOn:
+    - name: sources
+  sourceRef:
+    kind: GitRepository
+    name: gateway-api           # flux/sources/gateway-api.yaml, tag v1.6.1
+  path: ./config/crd            # that directory's kustomization.yaml == the standard channel
+  prune: false                  # never garbage-collect cluster-wide CRDs automatically
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cert-manager
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  dependsOn:
+    - name: sources
+  sourceRef:
+    kind: GitRepository
+    name: wproofreader-gitops
+  path: ./flux/shared/cert-manager
+  prune: true
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 1m
+  timeout: 10m
+  dependsOn:
+    - name: gateway-api-crds
+  sourceRef:
+    kind: GitRepository
+    name: wproofreader-gitops
+  path: ./flux/shared/traefik
+  prune: true
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-resources
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 1m
+  timeout: 3m
+  dependsOn:
+    - name: cert-manager
+  sourceRef:
+    kind: GitRepository
+    name: wproofreader-gitops
+  path: ./flux/shared/cluster-resources
+  prune: true
+  wait: true

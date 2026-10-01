@@ -1,0 +1,37 @@
+# Cluster dependencies shared by every WProofreader stack (Gateway API, cert-manager,
+# Traefik, ClusterIssuer). The only project with cluster-scoped rights.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: shared
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  description: Shared cluster dependencies (Gateway API, cert-manager, Traefik). Cluster-scoped rights.
+  sourceRepos:
+    - https://github.com/WebSpellChecker/wproofreader-gitops
+    - https://charts.jetstack.io
+    - https://traefik.github.io/charts
+  # kube-system: the CRD Application's placeholder destination and cert-manager's
+  # leader-election Role/RoleBinding.
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: cert-manager
+    - server: https://kubernetes.default.svc
+      namespace: traefik
+    - server: https://kubernetes.default.svc
+      namespace: kube-system
+  # Cluster-scoped kinds the charts render (enumerated from `helm template` of cert-manager
+  # v1.21.1, Traefik 41.5.0 and the Gateway API v1.6.1 CRDs). Extend on chart bumps.
+  clusterResourceWhitelist:
+    - { group: "", kind: Namespace }                                    # CreateNamespace=true
+    - { group: apiextensions.k8s.io, kind: CustomResourceDefinition }
+    - { group: rbac.authorization.k8s.io, kind: ClusterRole }
+    - { group: rbac.authorization.k8s.io, kind: ClusterRoleBinding }
+    - { group: admissionregistration.k8s.io, kind: MutatingWebhookConfiguration }
+    - { group: admissionregistration.k8s.io, kind: ValidatingWebhookConfiguration }
+    - { group: admissionregistration.k8s.io, kind: ValidatingAdmissionPolicy }
+    - { group: admissionregistration.k8s.io, kind: ValidatingAdmissionPolicyBinding }
+    - { group: gateway.networking.k8s.io, kind: GatewayClass }
+    - { group: cert-manager.io, kind: ClusterIssuer }

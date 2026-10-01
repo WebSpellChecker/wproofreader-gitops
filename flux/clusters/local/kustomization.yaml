@@ -1,0 +1,8 @@
+# One directory per cluster. It lists the layers this cluster runs; add an environment by
+# adding its Kustomization file here.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - sources.yaml
+  - shared.yaml
+  - demo-wproofreader-stack.yaml

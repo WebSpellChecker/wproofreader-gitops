@@ -1,0 +1,24 @@
+# One environment: the three product HelmReleases and one generated ConfigMap per values
+# file. values/*.yaml are plain Helm values files (the files that `helm install -f` takes).
+# A change in a values file gives a new ConfigMap name, and the HelmRelease reconciles
+# (helm-controller upgrades the release only if the effective values changed).
+# The namespace below is the namespace of this environment.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: wsc
+resources:
+  - mysql.yaml
+  - wproofreader-app.yaml
+  - admin-panel.yaml
+configMapGenerator:
+  - name: mysql-values
+    files:
+      - values.yaml=values/mysql.yaml
+  - name: wproofreader-app-values
+    files:
+      - values.yaml=values/wproofreader-app.yaml
+  - name: admin-panel-values
+    files:
+      - values.yaml=values/admin-panel.yaml
+configurations:
+  - ../../kustomizeconfig.yaml

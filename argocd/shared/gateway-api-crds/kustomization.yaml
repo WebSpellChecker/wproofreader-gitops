@@ -1,0 +1,9 @@
+# Gateway API CRDs, standard channel (Gateway, GatewayClass, HTTPRoute, ReferenceGrant —
+# everything the Admin-panel chart and Traefik's Gateway provider need). Pulled as a
+# remote resource so ArgoCD applies them declaratively. Version matches the Traefik
+# release in argocd/shared/apps/02-traefik.yaml; bump both together.
+# Gateway API v1.6.1 needs Kubernetes 1.31 or later: its TLSRoute CRD uses the CEL isIP() function.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.1/standard-install.yaml

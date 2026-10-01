@@ -1,0 +1,61 @@
+# Root of the WProofreader stack. Apply this ONE file once:
+#
+#   kubectl apply -n argocd -f argocd/root-app.yaml
+#
+# The root syncs argocd/bootstrap/ recursively, in sync-wave order:
+#   wave -1  argocd/bootstrap/projects/*   AppProjects (bootstrap, shared, wproofreader) — reconciled from git
+#   wave  0  argocd/bootstrap/shared.yaml  App-of-Apps -> argocd/shared (CRDs -> cert-manager -> Traefik -> ClusterIssuer)
+#   wave  1  argocd/bootstrap/wproofreader-stacks.yaml  ApplicationSet: one stack App-of-Apps per argocd/environments/<name>/
+#
+# The root runs in the `root` AppProject defined below: this repo only, the argocd namespace
+# only, Argo CD kinds only. It is still admin-level (it creates AppProjects and Applications),
+# so push/merge access to this repository IS Argo CD admin access — protect the branch and
+# require review (.github/CODEOWNERS). This file is the bootstrap: re-apply it to change the
+# root project. See root-app-no-shared.yaml for clusters that already have a GatewayClass and
+# a ClusterIssuer.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  description: Root of the WProofreader stack. Admin bootstrap — may only create Argo CD objects in the argocd namespace from this repo.
+  sourceRepos:
+    - https://github.com/WebSpellChecker/wproofreader-gitops
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: argocd
+  namespaceResourceWhitelist:
+    - group: argoproj.io
+      kind: AppProject
+    - group: argoproj.io
+      kind: Application
+    - group: argoproj.io
+      kind: ApplicationSet
+  clusterResourceWhitelist: []
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wproofreader-root
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: root
+  source:
+    repoURL: https://github.com/WebSpellChecker/wproofreader-gitops
+    targetRevision: main
+    path: argocd/bootstrap
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 10
+      backoff: { duration: 15s, factor: 2, maxDuration: 3m }

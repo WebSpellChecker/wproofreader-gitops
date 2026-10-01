@@ -1,0 +1,4 @@
+# local secret manifests — never commit real secrets
+secrets/
+*.local.yaml
+.DS_Store

@@ -1,0 +1,33 @@
+# Wave -1: Traefik with the Gateway API provider enabled (registers the `traefik`
+# GatewayClass). Swap for Envoy Gateway if you prefer (then set gatewayClassName=eg,
+# gateway.listenerPort=80, tls.listenerPort=443 in argocd/environments/<name>/admin-panel.yaml).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: shared
+  sources:
+    - repoURL: https://traefik.github.io/charts
+      chart: traefik
+      targetRevision: 41.5.0   # Traefik v3.7; Gateway API v1.6.1 CRDs from wave -3
+      helm:
+        skipCrds: true         # Gateway-only: the chart bundles 25 traefik.io/hub.traefik.io CRDs we do not use
+        valueFiles:
+          - $values/argocd/shared/traefik/values.yaml
+    - repoURL: https://github.com/WebSpellChecker/wproofreader-gitops
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    retry:                                   # waves between Applications are best-effort on first sync; retry instead of staying Failed
+      limit: 10
+      backoff: { duration: 15s, factor: 2, maxDuration: 3m }
+    syncOptions:
+      - CreateNamespace=true

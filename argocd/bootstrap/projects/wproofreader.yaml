@@ -1,0 +1,21 @@
+# The WProofreader product stack (MySQL, WProofreader Server, Admin-panel). Namespace-scoped:
+# no cluster resources, no access to the argocd namespace. Every environment's namespace
+# must be listed here (and created, with its secrets, before the first sync).
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: wproofreader
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  description: WProofreader product stack. Namespace-scoped.
+  sourceRepos:
+    - https://github.com/WebSpellChecker/wproofreader-gitops
+    - https://github.com/WebSpellChecker/admin-panel-helm
+    - https://github.com/WebSpellChecker/wproofreader-helm
+    - https://github.com/WebSpellChecker/mysql-server-helm
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: wsc                # argocd/environments/demo
+  clusterResourceWhitelist: []

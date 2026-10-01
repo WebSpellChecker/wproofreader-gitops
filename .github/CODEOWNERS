@@ -1,0 +1,5 @@
+# Merge access to these paths is cluster-admin access on every cluster that follows this repo:
+# the Argo CD root syncs argocd/bootstrap/ and the stack chart, and the Flux root syncs
+# flux/clusters/ without further review. Require an owner review.
+/argocd/                  @WebSpellChecker/devops
+/flux/                    @WebSpellChecker/devops

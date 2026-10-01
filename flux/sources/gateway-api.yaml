@@ -1,0 +1,17 @@
+# Gateway API CRDs, standard channel. Flux discourages kustomize remote bases (and admins can
+# disable them with --no-remote-bases), so the CRDs come from the upstream Git tag: its
+# config/crd/kustomization.yaml lists exactly the 11 standard-channel CRDs of the release.
+# Bump the tag together with the Traefik chart in flux/shared/traefik/helmrelease.yaml.
+# Gateway API v1.6.1 needs Kubernetes 1.31 or later: its TLSRoute CRD uses the CEL isIP() function.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: gateway-api
+spec:
+  interval: 1h
+  url: https://github.com/kubernetes-sigs/gateway-api
+  ref:
+    tag: v1.6.1
+  ignore: |
+    /*
+    !/config/crd/

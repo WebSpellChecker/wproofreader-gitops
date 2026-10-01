@@ -1,0 +1,43 @@
+# admin-panel: web, worker, scheduler, and the migration hook. The chart creates its own
+# Gateway on the `traefik` GatewayClass and routes /wscservice to WProofreader Server on the
+# same host name. The image tag defaults to the chart appVersion (Admin-panel 3.0.0).
+config:
+  appUrl: https://wproofreader.example.com
+  appServerUrl: https://wproofreader.example.com/wscservice/api   # browser-facing, same host
+  appServerInternalUrl: http://wproofreader-app.wsc.svc.cluster.local/wscservice/api
+  db:
+    host: mysql-primary.wsc.svc.cluster.local
+    port: 3306
+    database: admin_panel_db
+    username: admin_panel
+  serviceDb:
+    host: mysql-primary.wsc.svc.cluster.local
+    port: 3306
+    database: cloud_service
+    username: app_service
+  mail:
+    mailer: log                      # demo: invitation links go to the web Pod log
+secrets:
+  existingSecret: admin-panel-secrets   # keys: APP_KEY, DB_PASSWORD, SERVICE_DB_PASSWORD
+gateway:
+  enabled: true
+  create: true
+  gatewayClassName: traefik
+  listenerPort: 8000                 # Traefik `web` entry point (the Service maps 80 to 8000)
+  hostnames:
+    - wproofreader.example.com
+  tls:
+    enabled: true
+    listenerPort: 8443               # Traefik `websecure` entry point (the Service maps 443 to 8443)
+    secretName: admin-panel-tls
+    certManager:
+      enabled: true
+      issuerRef:
+        name: selfsigned
+        kind: ClusterIssuer
+  wproofreader:
+    enabled: true
+    serviceName: wproofreader-app    # Service of the wproofreader-app release
+    servicePort: 80
+ingress:
+  enabled: false

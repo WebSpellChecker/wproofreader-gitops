@@ -1,0 +1,29 @@
+# MySQL 8.4 for Admin-panel (admin_panel_db) and WProofreader Server (cloud_service). The release name is fixed: the values files use the Service name mysql-primary.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mysql
+spec:
+  interval: 10m
+  timeout: 15m                 # hook Jobs wait for their database themselves
+  releaseName: mysql
+  chart:
+    spec:
+      chart: ./
+      sourceRef:
+        kind: GitRepository
+        name: mysql-server-helm
+        namespace: flux-system
+      reconcileStrategy: Revision   # re-package on every pinned-commit change, even without a Chart.yaml version bump
+      interval: 10m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  valuesFrom:
+    - kind: ConfigMap
+      name: mysql-values

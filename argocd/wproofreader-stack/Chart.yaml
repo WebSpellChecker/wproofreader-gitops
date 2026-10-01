@@ -1,0 +1,5 @@
+apiVersion: v2
+name: wproofreader-stack
+description: App-of-Apps for one WProofreader stack (MySQL, WProofreader Server, Admin-panel). Renders Argo CD Applications only.
+type: application
+version: 0.2.0

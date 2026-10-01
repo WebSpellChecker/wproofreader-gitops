@@ -1,0 +1,8 @@
+# Self-signed ClusterIssuer for dev TLS. For prod, replace with a real issuer
+# (e.g. Let's Encrypt ACME) and update gateway.tls.certManager.issuerRef in the admin-panel values file.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned
+spec:
+  selfSigned: {}

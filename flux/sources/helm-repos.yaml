@@ -1,0 +1,16 @@
+# Public Helm repositories for the shared layer. Chart versions are pinned in the HelmReleases.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: jetstack
+spec:
+  interval: 1h
+  url: https://charts.jetstack.io
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: traefik
+spec:
+  interval: 1h
+  url: https://traefik.github.io/charts

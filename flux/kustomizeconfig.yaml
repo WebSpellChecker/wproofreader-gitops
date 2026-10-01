@@ -1,0 +1,9 @@
+# Lets kustomize rewrite the ConfigMap name in HelmRelease.spec.valuesFrom when a
+# configMapGenerator adds its content hash suffix: a change to a values file produces a new
+# ConfigMap name, which makes the HelmRelease reconcile (and upgrade if the values differ).
+nameReference:
+  - kind: ConfigMap
+    version: v1
+    fieldSpecs:
+      - path: spec/valuesFrom/name
+        kind: HelmRelease

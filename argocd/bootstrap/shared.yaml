@@ -1,0 +1,26 @@
+# Wave 0: cluster dependencies (Gateway API CRDs, cert-manager, Traefik, ClusterIssuer).
+# Optional on clusters that already provide a GatewayClass and a ClusterIssuer — deploy
+# only wproofreader-stack there and point the admin-panel values at the existing ones.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shared
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: bootstrap
+  source:
+    repoURL: https://github.com/WebSpellChecker/wproofreader-gitops
+    targetRevision: main
+    path: argocd/shared/apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    retry:                                   # waves between Applications are best-effort on first sync; retry instead of staying Failed
+      limit: 10
+      backoff: { duration: 15s, factor: 2, maxDuration: 3m }
