@@ -7,8 +7,7 @@ and Admin-panel in sync-wave order.
 It reads the product charts from `wproofreader-helm`, `admin-panel-helm`, and `mysql-server-helm`,
 and the values files from this repository.
 
-The
-[Kubernetes installation guide](https://docs.wproofreader.com/deployment/installation/kubernetes)
+The [Kubernetes installation guide](https://docs.wproofreader.com/deployment/installation/kubernetes)
 installs the same charts with Helm commands.
 It uses the same namespace (`wsc`), release names, and Secrets.
 
@@ -324,10 +323,10 @@ They become `Healthy` without action.
 The status of the ApplicationSet does not show the health of the workloads.
 Look at the Applications for that.
 
-You can monitor the hook Jobs in the `wsc` namespace:
+You can monitor the Pods in the `wsc` namespace, also the Pods of the hook Jobs:
 
 ```bash
-kubectl -n wsc get jobs,pods --watch
+kubectl -n wsc get pods --watch
 ```
 
 The `wproofreader-app-db-provision` Job completes before the WProofreader Server Pod starts.
@@ -353,7 +352,10 @@ kubectl -n wsc get gateway,httproute,certificate
 The Gateway shows `PROGRAMMED True`, and the certificate shows `READY True`.
 
 Send requests to Admin-panel and WProofreader Server.
-The `--resolve` option sends the host name to the Traefik address, so you do not need a DNS record:
+`wproofreader.example.com` is the host name of the `demo` environment.
+If you changed the host name in your copy, use your host name in this step and in step 8.
+The `--resolve` option sends the host name to the Traefik address, so you do not need a DNS record.
+If a DNS record for your host name already points to the Traefik address, you can remove `--resolve`:
 
 ```bash
 H=wproofreader.example.com
@@ -379,6 +381,8 @@ Replace `<LB_IP>` with the address from step 7:
 ```
 <LB_IP> wproofreader.example.com
 ```
+
+If a DNS record for your host name already points to the Traefik address, skip this change.
 
 Get a setup link:
 
