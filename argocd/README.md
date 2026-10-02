@@ -96,7 +96,7 @@ first, and it starts the next wave when the previous wave is healthy.
 flowchart TB
   subgraph root["wproofreader-root (bootstrap/)"]
     direction LR
-    projects["-1 AppProjects"] --> shared["0 shared"] --> appset["1 ApplicationSet wproofreader-stacks"]
+    projects["-1 AppProjects"] --> shared["0 shared"] --> appset["1 ApplicationSet<br/>wproofreader-stacks"]
   end
   subgraph sharedapps["shared (shared/apps/)"]
     direction LR
