@@ -19,9 +19,9 @@ It uses the same namespace (`wsc`), release names, and Secrets.
 | Gateway API CRDs | v1.6.1, standard channel |
 | cert-manager | v1.21.1 |
 | Traefik chart | 41.5.0 (Traefik 3.7) |
-| mysql-server-helm | commit `399ecb2` on `main` (chart 1.0.0), MySQL 8.4 |
-| wproofreader-helm | commit `0c95786` on `main` (chart 1.4.0), WProofreader Server 6.18.1.0 |
-| admin-panel-helm | commit `defea36` on `development` (chart 1.0.0), Admin-panel 3.0.0 |
+| mysql-server-helm | tag `v1.0.0` (chart 1.0.0), MySQL 8.4 |
+| wproofreader-helm | tag `v1.4.0` (chart 1.4.0), WProofreader Server 6.18.1.0 |
+| admin-panel-helm | tag `v1.0.0` (chart 1.0.0), Admin-panel 3.0.0 |
 
 ## Layout
 
@@ -420,10 +420,9 @@ cp -r argocd/environments/demo argocd/environments/production
 
 ## Change a chart version
 
-The product charts are pinned to commit SHAs in `wproofreader-stack/values.yaml`.
-Change the revision, then commit and push.
-Use a commit that exists in the remote chart repository.
-You can use a release tag after the chart repository publishes one.
+The product charts are pinned to release tags in `wproofreader-stack/values.yaml`.
+Change the revision to the new tag, then commit and push.
+The tag must exist in the remote chart repository.
 
 Before you upgrade, back up `admin_panel_db` and `cloud_service`.
 A rollback does not undo database migrations.
