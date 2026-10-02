@@ -8,14 +8,14 @@ gitops:
   repoURL: https://github.com/WebSpellChecker/wproofreader-gitops
   revision: main
 
-# Chart sources, pinned to a commit or a tag
+# Chart sources, pinned to release tags
 charts:
   mysql:
     repoURL: https://github.com/WebSpellChecker/mysql-server-helm
-    revision: 399ecb231912f748e6fe5b7602f1ba71daa6b1f1   # main (chart 1.0.0); MySQL 8.4 is set in the values file
+    revision: v1.0.0   # chart 1.0.0; MySQL 8.4 is set in the values file
   wproofreader:
     repoURL: https://github.com/WebSpellChecker/wproofreader-helm
-    revision: 0c957862acbafd93641dfb2ec105eec387a3d53b   # main (chart 1.4.0, WProofreader 6.18.1.0); change to v1.4.0 when tagged
+    revision: v1.4.0   # chart 1.4.0, WProofreader Server 6.18.1.0
   adminPanel:
     repoURL: https://github.com/WebSpellChecker/admin-panel-helm
-    revision: defea3616e6d4391be89f061f126b9437760eb99   # development (chart 1.0.0, Admin-panel 3.0.0); change to v1.0.0 when tagged
+    revision: v1.0.0   # chart 1.0.0, Admin-panel 3.0.0

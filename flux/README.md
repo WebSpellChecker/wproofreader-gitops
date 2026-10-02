@@ -18,9 +18,9 @@ It uses the same namespace (`wsc`), release names, and Secrets.
 | Gateway API CRDs | v1.6.1, standard channel |
 | cert-manager | v1.21.1 |
 | Traefik chart | 41.5.0 (Traefik 3.7) |
-| mysql-server-helm | commit `399ecb2` on `main` (chart 1.0.0), MySQL 8.4 |
-| wproofreader-helm | commit `0c95786` on `main` (chart 1.4.0), WProofreader Server 6.18.1.0 |
-| admin-panel-helm | commit `defea36` on `development` (chart 1.0.0), Admin-panel 3.0.0 |
+| mysql-server-helm | tag `v1.0.0` (chart 1.0.0), MySQL 8.4 |
+| wproofreader-helm | tag `v1.4.0` (chart 1.4.0), WProofreader Server 6.18.1.0 |
+| admin-panel-helm | tag `v1.0.0` (chart 1.0.0), Admin-panel 3.0.0 |
 
 ## Layout
 
@@ -423,12 +423,10 @@ For a second cluster, copy `clusters/local/` and keep only the environments of t
 
 ## Change a chart version
 
-The product charts are pinned in `sources/charts.yaml` with `ref.branch` and `ref.commit`.
-Change both values, then commit and push.
-The commit must be on the selected remote branch because source-controller makes
-a shallow clone of that branch.
-You can replace both fields with `ref.tag` after the chart repository publishes a release tag.
-The HelmReleases use `reconcileStrategy: Revision`, so Flux packages a new commit also when
+The product charts are pinned to release tags in `sources/charts.yaml` with `ref.tag`.
+Change the tag, then commit and push.
+The tag must exist in the remote chart repository.
+The HelmReleases use `reconcileStrategy: Revision`, so Flux packages a new revision also when
 the chart version in `Chart.yaml` stays the same.
 
 Before you upgrade, back up `admin_panel_db` and `cloud_service`.

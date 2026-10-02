@@ -1,5 +1,4 @@
-# Product charts pinned to exact commits. Keep branch + commit together: Flux makes a
-# shallow clone of the branch, so the commit must be reachable from that branch.
+# Product charts pinned to release tags.
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -8,8 +7,7 @@ spec:
   interval: 10m
   url: https://github.com/WebSpellChecker/mysql-server-helm
   ref:
-    branch: main
-    commit: 399ecb231912f748e6fe5b7602f1ba71daa6b1f1   # chart 1.0.0; MySQL 8.4 is set in the values file
+    tag: v1.0.0   # chart 1.0.0; MySQL 8.4 is set in the values file
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
@@ -19,8 +17,7 @@ spec:
   interval: 10m
   url: https://github.com/WebSpellChecker/wproofreader-helm
   ref:
-    branch: main
-    commit: 0c957862acbafd93641dfb2ec105eec387a3d53b   # chart 1.4.0, WProofreader Server 6.18.1.0
+    tag: v1.4.0   # chart 1.4.0, WProofreader Server 6.18.1.0
   ignore: |
     # put only the chart directory in the artifact
     /*
@@ -34,8 +31,7 @@ spec:
   interval: 10m
   url: https://github.com/WebSpellChecker/admin-panel-helm
   ref:
-    branch: development
-    commit: defea3616e6d4391be89f061f126b9437760eb99   # chart 1.0.0, Admin-panel 3.0.0
+    tag: v1.0.0   # chart 1.0.0, Admin-panel 3.0.0
   ignore: |
     /*
     !/admin-panel/

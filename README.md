@@ -113,9 +113,9 @@ This repository refers to them by URL and pinned revision.
 | Gateway API CRDs | v1.6.1, standard channel | cluster scope | none |
 | cert-manager | v1.21.1, with a self-signed ClusterIssuer | `cert-manager` | `cert-manager` |
 | Traefik | chart 41.5.0 (Traefik 3.7), Gateway API provider only | `traefik` | `traefik` |
-| MySQL | 8.4 (mysql-server-helm chart 1.0.0, commit `399ecb2` on `main`) | `wsc` | `mysql` |
-| WProofreader Server and db-manager | 6.18.1.0 (wproofreader-helm chart 1.4.0, commit `0c95786` on `main`) | `wsc` | `wproofreader-app` |
-| Admin-panel | 3.0.0 (admin-panel-helm chart 1.0.0, commit `defea36` on `development`) | `wsc` | `admin-panel` |
+| MySQL | 8.4 (mysql-server-helm chart 1.0.0, tag `v1.0.0`) | `wsc` | `mysql` |
+| WProofreader Server and db-manager | 6.18.1.0 (wproofreader-helm chart 1.4.0, tag `v1.4.0`) | `wsc` | `wproofreader-app` |
+| Admin-panel | 3.0.0 (admin-panel-helm chart 1.0.0, tag `v1.0.0`) | `wsc` | `admin-panel` |
 
 Both controllers install the shared components first.
 Then, for each environment, they install MySQL, WProofreader Server, and Admin-panel in this order.
