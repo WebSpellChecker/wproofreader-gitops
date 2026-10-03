@@ -211,10 +211,10 @@ that your cluster can read, for example a fork or a new private repository.
 
 ## Pinned versions
 
-The product charts are pinned to exact commits because the required chart releases do
-not yet have Git tags.
-The commits are in `argocd/wproofreader-stack/values.yaml` and `flux/sources/charts.yaml`.
+The product charts are pinned to release tags.
+The tags are in `argocd/wproofreader-stack/values.yaml` and `flux/sources/charts.yaml`.
 The Argo CD and Flux pins must stay equal.
+`scripts/check-parity.sh` compares the tags and the chart directories of the two directories.
 
 The cert-manager and Traefik chart versions and the Gateway API version are in
 the shared configuration of each directory.

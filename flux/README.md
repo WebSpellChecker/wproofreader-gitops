@@ -33,7 +33,7 @@ flux/
 │       ├── sources.yaml            -> flux/sources
 │       ├── shared.yaml             gateway-api-crds, cert-manager, traefik, cluster-resources
 │       └── demo-wproofreader-stack.yaml  -> flux/environments/demo   (one file for each environment)
-├── sources/                    # GitRepository objects for the 3 product charts (pinned commits) and Gateway API v1.6.1,
+├── sources/                    # GitRepository objects for the 3 product charts (pinned release tags) and Gateway API v1.6.1,
 │                               # HelmRepository objects for jetstack and traefik
 ├── shared/
 │   ├── cert-manager/           # Namespace, HelmRelease v1.21.1, values.yaml (in a generated ConfigMap)
@@ -346,7 +346,8 @@ Send requests to Admin-panel and WProofreader Server.
 `wproofreader.example.com` is the host name of the `demo` environment.
 If you changed the host name in your copy, use your host name in this step and in step 8.
 The `--resolve` option sends the host name to the Traefik address, so you do not need a DNS record.
-If a DNS record for your host name already points to the Traefik address, you can remove `--resolve`:
+If a DNS record for your host name already points to the Traefik address,
+you can remove `--resolve`:
 
 ```bash
 H=wproofreader.example.com
@@ -426,6 +427,8 @@ For a second cluster, copy `clusters/local/` and keep only the environments of t
 The product charts are pinned to release tags in `sources/charts.yaml` with `ref.tag`.
 Change the tag, then commit and push.
 The tag must exist in the remote chart repository.
+If the release moves the chart to a different directory, also change `chart:` in
+the HelmRelease in `environments/<environment>/`.
 The HelmReleases use `reconcileStrategy: Revision`, so Flux packages a new revision also when
 the chart version in `Chart.yaml` stays the same.
 

@@ -355,7 +355,8 @@ Send requests to Admin-panel and WProofreader Server.
 `wproofreader.example.com` is the host name of the `demo` environment.
 If you changed the host name in your copy, use your host name in this step and in step 8.
 The `--resolve` option sends the host name to the Traefik address, so you do not need a DNS record.
-If a DNS record for your host name already points to the Traefik address, you can remove `--resolve`:
+If a DNS record for your host name already points to the Traefik address,
+you can remove `--resolve`:
 
 ```bash
 H=wproofreader.example.com
@@ -427,6 +428,8 @@ cp -r argocd/environments/demo argocd/environments/production
 The product charts are pinned to release tags in `wproofreader-stack/values.yaml`.
 Change the revision to the new tag, then commit and push.
 The tag must exist in the remote chart repository.
+If the release moves the chart to a different directory, also change `path:` in
+the template of the chart in `wproofreader-stack/templates/`.
 
 Before you upgrade, back up `admin_panel_db` and `cloud_service`.
 A rollback does not undo database migrations.

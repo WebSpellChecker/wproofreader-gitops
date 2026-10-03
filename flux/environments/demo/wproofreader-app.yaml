@@ -16,7 +16,7 @@ spec:
         kind: GitRepository
         name: wproofreader-helm
         namespace: flux-system
-      reconcileStrategy: Revision   # re-package on every pinned-commit change, even without a Chart.yaml version bump
+      reconcileStrategy: Revision   # re-package on every pinned-revision change, even without a Chart.yaml version bump
       interval: 10m
   install:
     remediation:
