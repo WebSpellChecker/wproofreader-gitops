@@ -13,7 +13,7 @@ spec:
   sources:
     - repoURL: {{ .Values.charts.mysql.repoURL }}
       targetRevision: {{ .Values.charts.mysql.revision }}
-      path: .
+      path: mysql
       helm:
         releaseName: mysql             # fixed: the values files use the Service name mysql-primary
         valueFiles:

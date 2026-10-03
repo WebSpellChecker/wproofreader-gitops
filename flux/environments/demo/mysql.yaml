@@ -9,7 +9,7 @@ spec:
   releaseName: mysql
   chart:
     spec:
-      chart: ./
+      chart: ./mysql
       sourceRef:
         kind: GitRepository
         name: mysql-server-helm

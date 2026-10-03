@@ -8,6 +8,10 @@ spec:
   url: https://github.com/WebSpellChecker/mysql-server-helm
   ref:
     tag: v1.0.0   # chart 1.0.0; MySQL 8.4 is set in the values file
+  ignore: |
+    # put only the chart directory in the artifact
+    /*
+    !/mysql/
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
