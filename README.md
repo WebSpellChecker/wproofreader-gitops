@@ -47,6 +47,31 @@ The configurations use the same charts, namespace (`wsc`), release names, Secret
 and Secret keys as the Kubernetes installation guide.
 Read that guide to learn what each component does and how the components connect.
 
+## Install the stack without GitOps
+
+The [Kubernetes installation guide](https://docs.wproofreader.com/deployment/installation/kubernetes) installs the same stack with Helm commands,
+step by step.
+Do the steps in this order:
+
+1. [Prerequisites](https://docs.wproofreader.com/deployment/installation/kubernetes/prerequisites)
+2. [Prepare MySQL](https://docs.wproofreader.com/deployment/installation/kubernetes/prepare-mysql)
+3. [Install WProofreader Server](https://docs.wproofreader.com/deployment/installation/kubernetes/install-wproofreader-server)
+4. [Install Admin-panel](https://docs.wproofreader.com/deployment/installation/kubernetes/install-admin-panel)
+5. [Create the first administrator](https://docs.wproofreader.com/deployment/installation/kubernetes/create-the-first-administrator)
+6. [Set up external access](https://docs.wproofreader.com/deployment/installation/kubernetes/set-up-external-access)
+
+To upgrade or remove the stack, see [Upgrade and uninstall](https://docs.wproofreader.com/deployment/installation/kubernetes/upgrade-and-uninstall).
+
+The guide and this repository use the same namespace (`wsc`), release names, Secrets,
+and chart versions.
+You can use the values files of an environment in this repository with the Helm commands,
+for example:
+
+```bash
+helm upgrade --install mysql ./mysql-server-helm/mysql --namespace wsc \
+  --values argocd/environments/demo/mysql.yaml
+```
+
 ## Select a controller
 
 The repository has one complete configuration for each controller.
