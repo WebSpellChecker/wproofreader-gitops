@@ -235,7 +235,7 @@ To use another controller, for example Envoy Gateway:
 
 To use an Ingress instead, set `gateway.enabled: false` and configure the `ingress` values
 in `admin-panel.yaml`.
-See the [Admin-panel routing guide](https://github.com/WebSpellChecker/admin-panel-helm/blob/master/docs/ROUTING.md).
+See the [Admin-panel routing guide](https://github.com/WebSpellChecker/admin-panel-helm/blob/main/docs/ROUTING.md).
 
 ## Production notes
 
@@ -246,7 +246,7 @@ See the [Admin-panel routing guide](https://github.com/WebSpellChecker/admin-pan
 - The demo keeps Admin-panel uploads in the Pod.
   They are lost when the Pod restarts.
   For production, enable the `persistence` PVC (ReadWriteMany) or use S3-compatible object storage.
-  See the [Admin-panel chart values](https://github.com/WebSpellChecker/admin-panel-helm/blob/master/admin-panel/values.yaml).
+  See the [Admin-panel chart values](https://github.com/WebSpellChecker/admin-panel-helm/blob/main/admin-panel/values.yaml).
 - The demo sets `config.mail.mailer: log`.
   Admin-panel does not send email, and invitation links go to the log of the web Pod.
   To send email, set the SMTP values.
@@ -269,6 +269,6 @@ See the [Admin-panel routing guide](https://github.com/WebSpellChecker/admin-pan
 | Repository | Content |
 | --- | --- |
 | [wproofreader-helm](https://github.com/WebSpellChecker/wproofreader-helm) | Helm chart for WProofreader Server and db-manager |
-| [admin-panel-helm](https://github.com/WebSpellChecker/admin-panel-helm) | Helm chart for Admin-panel, with a [quick start](https://github.com/WebSpellChecker/admin-panel-helm/blob/master/docs/QUICKSTART.md) |
+| [admin-panel-helm](https://github.com/WebSpellChecker/admin-panel-helm) | Helm chart for Admin-panel, with a [quick start](https://github.com/WebSpellChecker/admin-panel-helm/blob/main/docs/QUICKSTART.md) |
 | [mysql-server-helm](https://github.com/WebSpellChecker/mysql-server-helm) | Helm chart for MySQL |
 | [wproofreader-docker](https://github.com/WebSpellChecker/wproofreader-docker) | Docker images and a Docker Compose example |
