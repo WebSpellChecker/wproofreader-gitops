@@ -12,10 +12,10 @@ gitops:
 charts:
   mysql:
     repoURL: https://github.com/WebSpellChecker/mysql-server-helm
-    revision: v1.0.0   # chart 1.0.0; MySQL 8.4 is set in the values file
+    revision: v1.1.0   # chart 1.1.0; MySQL 8.4 is set in the values file
   wproofreader:
     repoURL: https://github.com/WebSpellChecker/wproofreader-helm
     revision: v1.4.0   # chart 1.4.0, WProofreader Server 6.18.1.0
   adminPanel:
     repoURL: https://github.com/WebSpellChecker/admin-panel-helm
-    revision: v1.0.0   # chart 1.0.0, Admin-panel 3.0.0
+    revision: v1.1.0   # chart 1.1.0, Admin-panel 3.1.0
