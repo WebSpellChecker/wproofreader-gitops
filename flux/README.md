@@ -18,9 +18,12 @@ It uses the same namespace (`wsc`), release names, and Secrets.
 | Gateway API CRDs | v1.6.1, standard channel |
 | cert-manager | v1.21.1 |
 | Traefik chart | 41.5.0 (Traefik 3.7) |
-| mysql-server-helm | tag `v1.0.0` (chart 1.0.0), MySQL 8.4 |
-| wproofreader-helm | tag `v1.4.0` (chart 1.4.0), WProofreader Server 6.18.1.0 |
-| admin-panel-helm | tag `v1.0.0` (chart 1.0.0), Admin-panel 3.0.0 |
+| mysql-server-helm | chart 1.0.0 or later, MySQL 8.4 |
+| wproofreader-helm | chart 1.4.0 or later (WProofreader Server 6.18.1.0 or later) |
+| admin-panel-helm | chart 1.0.0 or later (Admin-panel 3.0.0 or later) |
+
+The product charts are pinned to release tags in `sources/charts.yaml`.
+See [Pinned versions](../README.md#pinned-versions).
 
 ## Layout
 
@@ -363,7 +366,8 @@ curl --silent --insecure --resolve "${H}:443:${LB_IP}" \
 
 The first command shows `301` (redirect to HTTPS).
 The second command shows `200`.
-The third response contains `6.18.1.0`, and the fourth response contains `"valid":true`.
+The third response contains `"ProgramVersion"` and the WProofreader Server version,
+and the fourth response contains `"valid":true`.
 
 ### 8. Create the first administrator
 
