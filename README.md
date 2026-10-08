@@ -113,9 +113,12 @@ This repository refers to them by URL and pinned revision.
 | Gateway API CRDs | v1.6.1, standard channel | cluster scope | none |
 | cert-manager | v1.21.1, with a self-signed ClusterIssuer | `cert-manager` | `cert-manager` |
 | Traefik | chart 41.5.0 (Traefik 3.7), Gateway API provider only | `traefik` | `traefik` |
-| MySQL | 8.4 (mysql-server-helm chart 1.0.0, tag `v1.0.0`) | `wsc` | `mysql` |
-| WProofreader Server and db-manager | 6.18.1.0 (wproofreader-helm chart 1.4.0, tag `v1.4.0`) | `wsc` | `wproofreader-app` |
-| Admin-panel | 3.0.0 (admin-panel-helm chart 1.0.0, tag `v1.0.0`) | `wsc` | `admin-panel` |
+| MySQL | 8.4 (mysql-server-helm chart 1.0.0 or later) | `wsc` | `mysql` |
+| WProofreader Server and db-manager | 6.18.1.0 or later (wproofreader-helm chart 1.4.0 or later) | `wsc` | `wproofreader-app` |
+| Admin-panel | 3.0.0 or later (admin-panel-helm chart 1.0.0 or later) | `wsc` | `admin-panel` |
+
+The product charts are pinned to release tags.
+See [Pinned versions](#pinned-versions).
 
 Both controllers install the shared components first.
 Then, for each environment, they install MySQL, WProofreader Server, and Admin-panel in this order.
@@ -215,6 +218,14 @@ The product charts are pinned to release tags.
 The tags are in `argocd/wproofreader-stack/values.yaml` and `flux/sources/charts.yaml`.
 The Argo CD and Flux pins must stay equal.
 `scripts/check-parity.sh` compares the tags and the chart directories of the two directories.
+
+The versions in the READMEs are the minimum chart versions for these configurations.
+After each chart release, we change the tags in both directories.
+Before the change goes to `main`, we deploy both directories on a test cluster and check the stack.
+To find the chart versions, see the releases of [wproofreader-helm](https://github.com/WebSpellChecker/wproofreader-helm/releases),
+[admin-panel-helm](https://github.com/WebSpellChecker/admin-panel-helm/releases),
+and [mysql-server-helm](https://github.com/WebSpellChecker/mysql-server-helm/releases).
+The `appVersion` in the `Chart.yaml` file of a chart is the application version that the chart installs.
 
 The cert-manager and Traefik chart versions and the Gateway API version are in
 the shared configuration of each directory.
