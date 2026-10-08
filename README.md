@@ -1,5 +1,12 @@
 # WProofreader GitOps examples
 
+[![wproofreader-helm](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2FWebSpellChecker%2Fwproofreader-gitops%2Fmain%2Fargocd%2Fwproofreader-stack%2Fvalues.yaml&query=%24.charts.wproofreader.revision&label=wproofreader-helm&color=brightgreen)](https://github.com/WebSpellChecker/wproofreader-helm/releases)
+[![admin-panel-helm](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2FWebSpellChecker%2Fwproofreader-gitops%2Fmain%2Fargocd%2Fwproofreader-stack%2Fvalues.yaml&query=%24.charts.adminPanel.revision&label=admin-panel-helm&color=brightgreen)](https://github.com/WebSpellChecker/admin-panel-helm/releases)
+[![mysql-server-helm](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2FWebSpellChecker%2Fwproofreader-gitops%2Fmain%2Fargocd%2Fwproofreader-stack%2Fvalues.yaml&query=%24.charts.mysql.revision&label=mysql-server-helm&color=brightgreen)](https://github.com/WebSpellChecker/mysql-server-helm/releases)
+
+The badges show the chart versions in `main`.
+We test each change of these versions with Argo CD and Flux before it goes to `main`.
+
 This repository contains example configurations that deploy the WProofreader stack on Kubernetes
 with a GitOps controller.
 The stack has WProofreader Server, Admin-panel, and a MySQL database.
