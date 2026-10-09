@@ -1,0 +1,53 @@
+name: Announce release
+
+# Posts to the releases chat when a release pull request (development -> main) is merged:
+# both trees and the clusters of the users take the new state from main.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  announce:
+    name: Announce the release in the releases chat
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Post the release message
+        env:
+          WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_RELEASES_WEBHOOK_URL }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "${WEBHOOK_URL}" ]; then
+            echo "::warning::GOOGLE_CHAT_RELEASES_WEBHOOK_URL is not set; no release announcement"
+            exit 0
+          fi
+          # Only the merge commit of a release pull request from development of this repository is a release.
+          # shellcheck disable=SC2016 # $ENV is jq syntax
+          release=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls" --jq '.[]
+            | select(.base.ref == "main" and .head.ref == "development" and .head.repo.full_name == $ENV.GITHUB_REPOSITORY
+                and .merge_commit_sha == $ENV.GITHUB_SHA)
+            | [.number, .title, .html_url] | @tsv' | head -n 1)
+          if [ -z "${release}" ]; then
+            echo "${GITHUB_SHA} is not the merge of a release pull request: no announcement"
+            exit 0
+          fi
+          IFS=$'\t' read -r number title url <<<"${release}"
+          # The chart tags that both trees pin (scripts/check-parity.sh keeps them equal).
+          pins=$(awk '/^charts:/ {c = 1} c && /repoURL:/ {r = $2; sub(/.*\//, "", r)}
+            c && /revision:/ {printf "%s%s %s", (n++ ? ", " : ""), r, $2}' argocd/wproofreader-stack/values.yaml)
+          # Google Chat text: *bold*; URLs become links.
+          text=$(printf '*%s* release #%s merged into main\n%s\nCharts: %s\nPull request: %s' \
+            "${GITHUB_REPOSITORY#*/}" "${number}" "${title}" "${pins}" "${url}")
+          if ! response=$(jq -n --arg text "${text}" '{text: $text}' \
+            | curl --fail-with-body -sS --max-time 15 -X POST -H 'Content-Type: application/json; charset=UTF-8' \
+              --data @- "${WEBHOOK_URL}"); then
+            echo "::warning::Google Chat rejected the release message: ${response}"
+            exit 0
+          fi
+          echo "Google Chat accepted the release message"
