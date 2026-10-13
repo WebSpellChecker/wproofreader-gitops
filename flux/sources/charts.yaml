@@ -35,7 +35,7 @@ spec:
   interval: 10m
   url: https://github.com/WebSpellChecker/admin-panel-helm
   ref:
-    tag: v1.1.0   # chart 1.1.0, Admin-panel 3.1.0
+    tag: v1.1.1   # chart 1.1.1, Admin-panel 3.1.1
   ignore: |
     # put only the chart directory in the artifact
     /*
