@@ -69,8 +69,8 @@ Do the steps in this order:
 
 To upgrade or remove the stack, see [Upgrade and uninstall](https://docs.wproofreader.com/deployment/installation/kubernetes/upgrade-and-uninstall).
 
-The guide and this repository use the same namespace (`wsc`), release names, Secrets,
-and chart versions.
+The guide and this repository use the same namespace (`wsc`), release names, Secret names,
+and Secret keys.
 You can use the values files of an environment in this repository with the Helm commands,
 for example:
 
