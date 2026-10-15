@@ -1,5 +1,5 @@
 # wproofreader-app: WProofreader Server and the db-manager provisioning hook.
-# The image tags default to the chart appVersion (WProofreader 6.18.1.0 for chart 1.4.0).
+# The image tags default to the chart appVersion.
 licenseExistingSecret: wproofreader-license   # key: license
 database:
   enabled: true
