@@ -1,6 +1,6 @@
 # admin-panel: web, worker, scheduler, and the migration hook. The chart creates its own
 # Gateway on the `traefik` GatewayClass and routes /wscservice to WProofreader Server on the
-# same host name. The image tag defaults to the chart appVersion (Admin-panel 3.0.0).
+# same host name. The image tag defaults to the chart appVersion.
 config:
   appUrl: https://wproofreader.example.com
   appServerUrl: https://wproofreader.example.com/wscservice/api   # browser-facing, same host
